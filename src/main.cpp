@@ -5,22 +5,41 @@
 
 // 计算射线和空间球体的相交结果，本质上是将射线的表达式带入球体表达式，看是否能得出结果
 // 若有一个或两个解，则对应射线和球体有一个或两个交点；若无解则不想交
-bool hit_sphere(const point3& center, double radius, const ray& r)
+double hit_sphere(const point3& center, double radius, const ray& r)
 {
     vec3 oc = center - r.origin();
-    auto a = dot(r.direction(), r.direction());
-    auto b = -2.0*dot(r.direction(), oc);
-    auto c = dot(oc, oc) - radius*radius;
-    auto discriminant = b*b - 4*a*c;    // 二次方程有无解就是看这个式子能否开根号，若小于0则开不出根号没有实数解
-    return discriminant >= 0;
+    // auto a = dot(r.direction(), r.direction());
+    // auto b = -2.0*dot(r.direction(), oc);
+    // auto c = dot(oc, oc) - radius*radius;
+    // auto discriminant = b*b - 4*a*c;    // 二次方程有无解就是看这个式子能否开根号，若小于0则开不出根号没有实数解
+    auto a = r.direction().length_squared();
+    auto h = dot(r.direction(), oc);
+    auto c = oc.length_squared() - radius*radius;
+    auto discriminant = h*h - a*c;
+
+    if(discriminant < 0)
+    {
+        return -1.0;
+    }
+    else
+    {
+        // 这里返回 -b-discriminant的这个解，因为这里是离射线更近的相交点，更远的相交点被挡住了看不见
+        // return (-b-sqrt(discriminant)) / (2.0*a);
+        return (h - sqrt(discriminant)) / a;
+    }
 }
 
 // return the color for a given scene ray
 color ray_color(const ray& r)
 {
-    if(hit_sphere(point3(0,0,-1), 0.5, r))
+    point3 sphere_center(0,0,-1);
+    auto t = hit_sphere(sphere_center, 0.5, r);
+    if(t > 0.0)
     {
-        return color(1,1,0);   
+        // 这里返回圆的法线作为颜色输出
+        vec3 N = unit_vector(r.at(t) - sphere_center);
+        // 法线可以是负数但是颜色不行，这里统一映射到0-1的空间
+        return 0.5*(N+vec3(1,1,1));
     }
 
     // lerp between two color
