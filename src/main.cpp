@@ -3,14 +3,30 @@
 #include "ray.h"
 #include "color.h"
 
+// 计算射线和空间球体的相交结果，本质上是将射线的表达式带入球体表达式，看是否能得出结果
+// 若有一个或两个解，则对应射线和球体有一个或两个交点；若无解则不想交
+bool hit_sphere(const point3& center, double radius, const ray& r)
+{
+    vec3 oc = center - r.origin();
+    auto a = dot(r.direction(), r.direction());
+    auto b = -2.0*dot(r.direction(), oc);
+    auto c = dot(oc, oc) - radius*radius;
+    auto discriminant = b*b - 4*a*c;    // 二次方程有无解就是看这个式子能否开根号，若小于0则开不出根号没有实数解
+    return discriminant >= 0;
+}
+
 // return the color for a given scene ray
 color ray_color(const ray& r)
 {
+    if(hit_sphere(point3(0,0,-1), 0.5, r))
+    {
+        return color(1,1,0);   
+    }
+
     // lerp between two color
     vec3 unit_dir = unit_vector(r.direction());
     auto a = 0.5*(unit_dir.y() + 1.0);  // 从范围-1至1映射到范围0至1
-    return (1.0-a)*color(1.0,1.0,1.0) + a*color(0.5, 0.7, 1.0);
-    // return color(0,0,0);
+    return (1.0-a)*color(1.0,1.0,1.0) + a*color(0.5, 0.7, 1.0);    
 }
 
 int main() 
@@ -23,13 +39,13 @@ int main()
     // must bigger than 1
     imageHeight = (imageHeight < 1) ? 1 : imageHeight;
 
-    auto viewportHeight = 2.f;
-    // aspect_ratio may vary depends on the real image height
-    auto viewportWidth = viewportHeight * double((imageWidth)/imageHeight);
-    
 
     // camera
     auto focal_length = 1.0;
+    auto viewportHeight = 2.f;
+    // aspect_ratio may vary depends on the real image height
+    auto viewportWidth = viewportHeight * (double(imageWidth)/imageHeight);
+    
     auto camera_center = point3(0,0,0);
     // 3D场景中的坐标轴是Y朝上，X朝右，Z朝向平面里面
     // 屏幕坐标轴是X朝右(u)，Y朝下(v)
