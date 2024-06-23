@@ -31,5 +31,17 @@
 *.out
 *.app
 
-# build foler
+# build folder
 /build
+/.idea
+/.vs
+/CMakeFiles
+/inOneWeekend.dir
+
+*.pdb
+*.vcxproj
+*.vcxproj.filters
+/x64
+CMakeCache.*
+*.sln
+*.cmake
