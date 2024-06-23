@@ -11,6 +11,15 @@ struct hit_record
     point3 p;
     vec3 normal;
     double t;
+    bool b_front_face;
+
+    void set_face_normal(const ray& r, const vec3& outward_normal)
+    {
+        // outward_normal must be unit vector
+        b_front_face = dot(r.direction(), outward_normal) < 0;
+        // set normal always go against in ray
+        normal = b_front_face ? outward_normal : -outward_normal;
+    }
 };
 
 class hittable
