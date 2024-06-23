@@ -21,16 +21,16 @@ public:
         hit_objects.push_back(object);
     }
 
-    bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override
+    bool hit(const ray& r, const interval& ray_t, hit_record& rec) const override
     {
         // hittable list的检测是需要检测所有object
         hit_record tmp_rec;
         bool hit_anything = false;
-        auto closest_distance = ray_tmax;
+        auto closest_distance = ray_t.max;
 
         for(const auto& object : hit_objects)
         {
-            if(object->hit(r,ray_tmin, closest_distance, tmp_rec))
+            if(object->hit(r, interval(ray_t.min, closest_distance), tmp_rec))
             {
                 hit_anything = true;
                 closest_distance = tmp_rec.t;
