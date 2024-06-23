@@ -2,8 +2,8 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include "rt_common.h"
 #include "hittable.h"
-#include "vec3.h"
 
 class sphere : public hittable
 {
@@ -12,6 +12,8 @@ public:
         : center(c), radius(fmax(0, r))
     { }
 
+    // 计算射线和空间球体的相交结果，本质上是将射线的表达式带入球体表达式，看是否能得出结果
+    // 若有一个或两个解，则对应射线和球体有一个或两个交点；若无解则不想交
     bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override
     {
         const vec3 oc = center - r.origin();
@@ -28,12 +30,12 @@ public:
         }
 
         const auto sqrt_d = sqrt(discriminant);
-        auto root = h-sqrt_d / a;
+        auto root = (h-sqrt_d) / a;
         // 这里检查两个可能的解，先检查离射线起点近的这一段
         if(root < ray_tmin || ray_tmax <= root)
         {
             // 再检查远的这一段，都不符合那就没有碰撞的结果
-            root = h + sqrt_d / a;
+            root = (h + sqrt_d) / a;
             if(root < ray_tmin || ray_tmax <= root)
             {
                 return false;

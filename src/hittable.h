@@ -2,7 +2,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "ray.h"
+#include "rt_common.h"
 // 碰撞物体基类
 
 // 碰撞记录

@@ -2,10 +2,7 @@
 #ifndef VEC3_H
 #define VEC3_H
 
-#include <cmath>
-#include <iostream>
-
-using std::sqrt;
+#include "rt_common.h"
 
 // vector 3 class
 class vec3

@@ -23,11 +23,11 @@ set ( SOURCE_ONE_WEEKEND
   # src/InOneWeekend/camera.h
   src/color.h
   src/hittable.h
-  # src/InOneWeekend/hittable_list.h
+  src/hittable_list.h
   # src/InOneWeekend/interval.h
   # src/InOneWeekend/material.h
-  # src/ray.h
-  # src/InOneWeekend/rtweekend.h
+  src/ray.h
+  src/rt_common.h
   src/sphere.h
   src/vec3.h
 )
