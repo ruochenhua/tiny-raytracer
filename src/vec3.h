@@ -54,6 +54,15 @@ public:
         return sqrt(length_squared());
     }
 
+    static vec3 random()
+    {
+        return vec3(random_double(), random_double(), random_double());
+    }
+
+    static vec3 random(double min, double max)
+    {
+        return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+    }
 };
 
 // point3 is an alias for vec3
@@ -102,5 +111,37 @@ inline vec3 cross(const vec3& u, const vec3& v) {
 inline vec3 unit_vector(const vec3& v) {
     return v / v.length();
 }
+
+inline vec3 random_in_unit_sphere()
+{
+    // 这里是教程的简单随机向量算法，要保证向量在一个半径为1的球内
+    // 一直执行随机算法直到找到合适的值(why?为什么不随机一个值然后直接normalize?)
+    // todo：肯定有优化方法
+    while(true)
+    {
+        auto p = vec3::random(-1, 1);
+        if(p.length_squared() < 1)
+        {
+            return p;
+        }
+    }
+}
+
+inline vec3 random_unit_vector()
+{
+    return unit_vector(random_in_unit_sphere());
+}
+
+// 获取法线同一面的，在球面上的随机向量
+inline vec3 random_on_hemisphere(const vec3& normal)
+{
+    vec3 on_unit_sphere = random_unit_vector();
+    if(dot(on_unit_sphere, normal) > 0.0)
+        return on_unit_sphere;
+    else
+        return -on_unit_sphere;
+}
+
+
 
 #endif

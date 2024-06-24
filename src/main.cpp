@@ -46,6 +46,7 @@ int main()
 
     // camera
     camera cam;
+    cam.max_depth = 100;
     cam.render(world);
     return 0;
 }
