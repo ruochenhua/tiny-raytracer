@@ -119,7 +119,8 @@ private:
         // interval从0.001开始，避免ray反弹的时候起始点取值取到表面内部
         if(world.hit(r, interval(0.001, infinity), rec))
         {
-            vec3 direction = random_on_hemisphere(rec.normal);
+            // vec3 direction = random_on_hemisphere(rec.normal);
+            vec3 direction = rec.normal + random_unit_vector(); // change distribution to lambertian
             return 0.5 * ray_color(ray(rec.p, direction), depth-1, world);
         }
 
