@@ -3,8 +3,8 @@
 #define HITTABLE_H
 
 #include "rt_common.h"
-// 碰撞物体基类
 
+class material;
 // 碰撞记录
 struct hit_record
 {
@@ -12,6 +12,7 @@ struct hit_record
     vec3 normal;
     double t;
     bool b_front_face;
+    shared_ptr<material> mat;
 
     void set_face_normal(const ray& r, const vec3& outward_normal)
     {
@@ -22,6 +23,7 @@ struct hit_record
     }
 };
 
+// 碰撞物体基类
 class hittable
 {
 public:

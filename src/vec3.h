@@ -54,6 +54,12 @@ public:
         return sqrt(length_squared());
     }
 
+    bool near_zero() const
+    {
+        auto MIN_VALUE = 1e-8;
+        return (fabs(e[0]) < MIN_VALUE) && (fabs(e[1]) < MIN_VALUE) && (fabs(e[2]) < MIN_VALUE);
+    }
+
     static vec3 random()
     {
         return vec3(random_double(), random_double(), random_double());
@@ -141,7 +147,6 @@ inline vec3 random_on_hemisphere(const vec3& normal)
     else
         return -on_unit_sphere;
 }
-
 
 
 #endif

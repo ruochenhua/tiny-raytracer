@@ -10,7 +10,9 @@ class sphere : public hittable
 public:
     sphere(const point3& c, double r)
         : center(c), radius(fmax(0, r))
-    { }
+    { 
+        // todo: init mat
+    }
 
     // 计算射线和空间球体的相交结果，本质上是将射线的表达式带入球体表达式，看是否能得出结果
     // 若有一个或两个解，则对应射线和球体有一个或两个交点；若无解则不想交
@@ -46,6 +48,7 @@ public:
         rec.p = r.at(root);
         auto outward_normal = (rec.p - center) / radius;
         rec.set_face_normal(r, outward_normal);
+        rec.mat = mat;
         
         return true;
     }
@@ -53,6 +56,7 @@ public:
 private:
     point3 center;
     double radius;
+    shared_ptr<material> mat;
 };
 
 #endif

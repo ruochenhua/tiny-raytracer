@@ -45,3 +45,4 @@
 CMakeCache.*
 *.sln
 *.cmake
+test_image.ppm
