@@ -8,10 +8,10 @@
 class sphere : public hittable
 {
 public:
-    sphere(const point3& c, double r)
-        : center(c), radius(fmax(0, r))
+    sphere(const point3& c, double r, shared_ptr<material> in_mat)
+        : center(c), radius(fmax(0, r)), mat(in_mat)
     { 
-        // todo: init mat
+        
     }
 
     // 计算射线和空间球体的相交结果，本质上是将射线的表达式带入球体表达式，看是否能得出结果

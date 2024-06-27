@@ -4,6 +4,7 @@
 
 #include "rt_common.h"
 #include "hittable.h"
+#include "material.h"
 
 class camera
 {
@@ -119,9 +120,16 @@ private:
         // interval从0.001开始，避免ray反弹的时候起始点取值取到表面内部
         if(world.hit(r, interval(0.001, infinity), rec))
         {
+            ray scattered;
+            color attenuation;
+            // 物体反射的颜色将会根据材质不同而不同
+            if(rec.mat->scatter(r, rec, attenuation, scattered))
+            {
+                return attenuation*ray_color(scattered, depth-1, world);
+            }
             // vec3 direction = random_on_hemisphere(rec.normal);
-            vec3 direction = rec.normal + random_unit_vector(); // change distribution to lambertian
-            return 0.5 * ray_color(ray(rec.p, direction), depth-1, world);
+            // vec3 direction = rec.normal + random_unit_vector(); 
+            return color(0,0,0);
         }
 
         // lerp between two color

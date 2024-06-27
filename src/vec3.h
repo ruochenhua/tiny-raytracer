@@ -148,5 +148,10 @@ inline vec3 random_on_hemisphere(const vec3& normal)
         return -on_unit_sphere;
 }
 
+// 计算反射
+inline vec3 reflect(const vec3& in_ray, const vec3& normal)
+{
+    return in_ray - 2*dot(in_ray, normal) * normal;
+}
 
 #endif
