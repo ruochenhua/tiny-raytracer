@@ -39,16 +39,18 @@ private:
 class metal : public material
 {
 public:
-    metal(const color& a) : albedo(a) {}
+    metal(const color& a, double r) : albedo(a), roughness(r < 1 ? r : 1) {}
     virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override
     {
         vec3 reflect_dir = reflect(r_in.direction(), rec.normal);
+        reflect_dir = unit_vector(reflect_dir) + (roughness*random_unit_vector());
         scattered = ray(rec.p, reflect_dir);
         attenuation = albedo;
-        return true;
+        return (dot(scattered.direction(), rec.normal) > 0);
     }
 private:
     color albedo;
+    double roughness;
 };
 
 #endif
