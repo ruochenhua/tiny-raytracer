@@ -154,4 +154,14 @@ inline vec3 reflect(const vec3& in_ray, const vec3& normal)
     return in_ray - 2*dot(in_ray, normal) * normal;
 }
 
+// 根据斯涅尔定律（折射定律）计算光的折射行为
+// refraction_ratio是光穿越两个介质的折射率的比值，具体是初始介质除以进入的介质
+inline vec3 refract(const vec3& in_ray, const vec3& normal, double refraction_ratio)
+{
+    auto cos_theta = fmin(dot(-in_ray, normal), 1.0);
+    vec3 r_out_perp = refraction_ratio * (in_ray + cos_theta*normal);   //折射向量垂直于法线的分量
+    vec3 r_out_parall = -sqrt(fabs(1.0 - r_out_perp.length_squared())) * normal;    //折射向量平行于法线的分量
+    return r_out_parall + r_out_perp;
+}
+
 #endif
