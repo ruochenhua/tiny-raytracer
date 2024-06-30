@@ -18,6 +18,9 @@ public:
     point3 lookfrom = point3(0,0,0);    // 相机位置
     point3 lookat = point3(0,0,-1);         // 看向什么地方
     vec3 vup = vec3(0,1,0);                 // up向量
+
+    double defocus_angle = 0;   //虚化角度
+    double focus_dist = 10;     //对焦距离
     void render(const hittable& world)
     {
         initialize();
@@ -72,6 +75,8 @@ private:
     //要做多次采样，所以每次采样会乘以一个系数，使得总采样数加起来的颜色是在正常范围
     double pixel_samples_scale;
     vec3 u,v,w;
+    vec3 defocus_disk_u;        // 失焦盘的水平半径
+    vec3 defocus_disk_v;        // 失焦盘垂直半径
     void initialize()
     {
         image_height = int(image_width) / aspect_ratio;
@@ -81,10 +86,10 @@ private:
         pixel_samples_scale = 1.0 / samples_per_pixel;
         camera_center = lookfrom;
         
-        auto focal_length = (lookfrom - lookat).length();
+        // auto focal_length = (lookfrom - lookat).length();
         auto theta = degrees_to_radians(vfov);
         auto h = tan(theta/2);
-        auto viewportHeight = 2.0 * h * focal_length;
+        auto viewportHeight = 2.0 * h * focus_dist;
         // aspect_ratio may vary depends on the real image height
         auto viewportWidth = viewportHeight * (double(image_width)/image_height);
 
@@ -103,9 +108,12 @@ private:
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height;
         // viewport的左上角是以相机为原点，偏移视口大小一半以及焦距的距离
-        auto viewport_upper_left = camera_center - (focal_length * w) - viewport_u/2 - viewport_v/2;
+        auto viewport_upper_left = camera_center - (focus_dist * w) - viewport_u/2 - viewport_v/2;
         // 第一个pixel的位置(中心点)是viewport左上角偏移半个像素大小的位置
         pixel_origin_loc = viewport_upper_left + 0.5*(pixel_delta_u + pixel_delta_v);
+        auto defocus_radius = focus_dist * tan(degrees_to_radians(defocus_angle/2));
+        defocus_disk_u = u * defocus_radius;
+        defocus_disk_v = v * defocus_radius;
     }
 
     vec3 sample_square() const
@@ -118,7 +126,8 @@ private:
     {
         auto offset = sample_square();
         auto pixel_sample = pixel_origin_loc + ((i+offset.x()) * pixel_delta_u) + ((j+offset.y()) * pixel_delta_v);
-        auto ray_origin = camera_center;
+        // auto ray_origin = camera_center;
+        auto ray_origin = (defocus_angle <=0 ) ? camera_center : defocus_disk_sample();
         auto ray_dir = pixel_sample - ray_origin;
 
         return ray(ray_origin, ray_dir);
@@ -151,6 +160,12 @@ private:
         vec3 unit_dir = unit_vector(r.direction());
         auto a = 0.5*(unit_dir.y() + 1.0);  // 从范围-1至1映射到范围0至1
         return (1.0-a)*color(1.0,1.0,1.0) + a*color(0.5, 0.7, 1.0);    
+    }
+
+    point3 defocus_disk_sample() const
+    {
+        auto p = random_in_unit_disk();
+        return camera_center + (p[0]*defocus_disk_u) + p[1]*defocus_disk_v;
     }
 };
 

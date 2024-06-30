@@ -118,6 +118,16 @@ inline vec3 unit_vector(const vec3& v) {
     return v / v.length();
 }
 
+inline vec3 random_in_unit_disk()
+{
+    while(true)
+    {
+        auto p = vec3(random_double(-1, 1), random_double(-1, 1), 0);
+        if(p.length_squared() < 1)
+            return p;
+    }
+}
+
 inline vec3 random_in_unit_sphere()
 {
     // 这里是教程的简单随机向量算法，要保证向量在一个半径为1的球内
