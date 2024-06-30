@@ -13,6 +13,11 @@ public:
     int image_width = 480;
     int samples_per_pixel = 10;     //每个像素做多次采样
     int max_depth = 10;     // 射线检测递归深度
+
+    double vfov = 75;       // 垂直fov的大小
+    point3 lookfrom = point3(0,0,0);    // 相机位置
+    point3 lookat = point3(0,0,-1);         // 看向什么地方
+    vec3 vup = vec3(0,1,0);                 // up向量
     void render(const hittable& world)
     {
         initialize();
@@ -65,7 +70,8 @@ private:
     vec3 pixel_delta_u;
     vec3 pixel_delta_v;
     //要做多次采样，所以每次采样会乘以一个系数，使得总采样数加起来的颜色是在正常范围
-    double pixel_samples_scale; 
+    double pixel_samples_scale;
+    vec3 u,v,w;
     void initialize()
     {
         image_height = int(image_width) / aspect_ratio;
@@ -73,22 +79,31 @@ private:
         image_height = (image_height < 1) ? 1 : image_height;
 
         pixel_samples_scale = 1.0 / samples_per_pixel;
-
-        auto focal_length = 1.0;
-        auto viewportHeight = 2.f;
+        camera_center = lookfrom;
+        
+        auto focal_length = (lookfrom - lookat).length();
+        auto theta = degrees_to_radians(vfov);
+        auto h = tan(theta/2);
+        auto viewportHeight = 2.0 * h * focal_length;
         // aspect_ratio may vary depends on the real image height
         auto viewportWidth = viewportHeight * (double(image_width)/image_height);
-    
-        camera_center = point3(0,0,0);
+
+        w = unit_vector(lookfrom - lookat);  // w是向前方向
+        u = unit_vector(cross(vup, w));         // u是向右方向
+        v = cross(w, u);                          // v是向上方向
+        
         // 3D场景中的坐标轴是Y朝上，X朝右，Z朝向平面里面
         // 屏幕坐标轴是X朝右(u)，Y朝下(v)
-        auto viewport_u = vec3(viewportWidth, 0, 0);
-        auto viewport_v = vec3(0, -viewportHeight, 0);
+        // auto viewport_u = vec3(viewportWidth, 0, 0);
+        // auto viewport_v = vec3(0, -viewportHeight, 0);
+        auto viewport_u = viewportWidth * u;
+        auto viewport_v = -viewportHeight * v;
+        
         // 每个pixel的大小
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height;
         // viewport的左上角是以相机为原点，偏移视口大小一半以及焦距的距离
-        auto viewport_upper_left = camera_center - vec3(0,0,focal_length) - viewport_u/2 - viewport_v/2;
+        auto viewport_upper_left = camera_center - (focal_length * w) - viewport_u/2 - viewport_v/2;
         // 第一个pixel的位置(中心点)是viewport左上角偏移半个像素大小的位置
         pixel_origin_loc = viewport_upper_left + 0.5*(pixel_delta_u + pixel_delta_v);
     }
