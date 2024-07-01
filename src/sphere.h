@@ -8,17 +8,25 @@
 class sphere : public hittable
 {
 public:
+    // 静止的球体
     sphere(const point3& c, double r, shared_ptr<material> in_mat)
-        : center(c), radius(fmax(0, r)), mat(in_mat)
+        : center(c), radius(fmax(0, r)), mat(in_mat), is_moving(false)
     { 
         
+    }
+
+    // 平移的球体
+    sphere(const point3& c, const point3& target_c, double r, shared_ptr<material> in_mat)
+        : center(c), radius(fmax(0, r)), mat(in_mat), is_moving(true), movement_vec(target_c-c)
+    {
+
     }
 
     // 计算射线和空间球体的相交结果，本质上是将射线的表达式带入球体表达式，看是否能得出结果
     // 若有一个或两个解，则对应射线和球体有一个或两个交点；若无解则不想交
     bool hit(const ray& r, const interval& ray_t, hit_record& rec) const override
     {
-        const vec3 oc = center - r.origin();
+        const vec3 oc = sphere_center(r.time()) - r.origin();
         // auto discriminant = b*b - 4*a*c;
         // 二次方程有无解就是看这个式子能否开根号，若小于0则开不出根号没有实数解
         auto a = r.direction().length_squared();
@@ -53,10 +61,19 @@ public:
         return true;
     }
 
+    point3 sphere_center(double time) const
+    {
+        // 这里也默认球体在做匀速运动，当然是不准确的
+        // 目前仅仅是测试动态模糊效果，可以不必深究
+        return center + time*movement_vec;
+    }
+
 private:
     point3 center;
     double radius;
     shared_ptr<material> mat;
+    bool is_moving;     
+    vec3 movement_vec;  //运动方向
 };
 
 #endif

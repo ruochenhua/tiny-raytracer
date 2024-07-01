@@ -29,7 +29,7 @@ public:
     {
         // 随机选一个方向作为散射方向
         auto scatter_dir = rec.normal + random_unit_vector();
-        scattered = ray(rec.p, scatter_dir);
+        scattered = ray(rec.p, scatter_dir, r_in.time());
         attenuation = albedo;
         return true;
     }
@@ -48,7 +48,7 @@ public:
     {
         vec3 reflect_dir = reflect(r_in.direction(), rec.normal);
         reflect_dir = unit_vector(reflect_dir) + (roughness*random_unit_vector());
-        scattered = ray(rec.p, reflect_dir);
+        scattered = ray(rec.p, reflect_dir, r_in.time());
         attenuation = albedo;
         return (dot(scattered.direction(), rec.normal) > 0);
     }
@@ -87,7 +87,7 @@ public:
         {
             new_dir = refract(unit_dir, rec.normal, ri);
         }
-        scattered = ray(rec.p, new_dir);
+        scattered = ray(rec.p, new_dir, r_in.time());
         return true;
     }
 

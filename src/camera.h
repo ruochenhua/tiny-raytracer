@@ -130,7 +130,9 @@ private:
         auto ray_origin = (defocus_angle <=0 ) ? camera_center : defocus_disk_sample();
         auto ray_dir = pixel_sample - ray_origin;
 
-        return ray(ray_origin, ray_dir);
+        auto ray_time = random_double();    // 目前默认时间是在[0,1]的区间内        
+
+        return ray(ray_origin, ray_dir, ray_time);
     }
 
 
