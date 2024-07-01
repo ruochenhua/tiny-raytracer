@@ -12,14 +12,20 @@ public:
     sphere(const point3& c, double r, shared_ptr<material> in_mat)
         : center(c), radius(fmax(0, r)), mat(in_mat), is_moving(false)
     { 
-        
+        // 静态球体的AABB，就是基于球心，变长为直径的正方体
+        auto rvec = vec3(radius, radius, radius);
+        bbox = aabb(c - rvec, c + rvec);
     }
 
     // 平移的球体
     sphere(const point3& c, const point3& target_c, double r, shared_ptr<material> in_mat)
         : center(c), radius(fmax(0, r)), mat(in_mat), is_moving(true), movement_vec(target_c-c)
     {
-
+        // 运动的球体的AABB包含运动前和运动后的区间
+        auto rvec = vec3(radius, radius, radius);
+        aabb bbox1(c - rvec, c + rvec);
+        aabb bbox2(target_c - rvec, target_c + rvec);
+        bbox = aabb(bbox1, bbox2);
     }
 
     // 计算射线和空间球体的相交结果，本质上是将射线的表达式带入球体表达式，看是否能得出结果
@@ -68,12 +74,14 @@ public:
         return center + time*movement_vec;
     }
 
+    aabb bounding_box() const override {return bbox;}
 private:
     point3 center;
     double radius;
     shared_ptr<material> mat;
     bool is_moving;     
     vec3 movement_vec;  //运动方向
+    aabb bbox;
 };
 
 #endif

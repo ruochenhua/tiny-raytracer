@@ -13,6 +13,12 @@ public:
 
     interval(double in_min, double in_max) : min(in_min), max(in_max) {}
 
+    interval(const interval& a, const interval& b)
+    {
+        min = fmin(a.min, b.min);
+        max = fmax(a.max, b.max);
+    }
+
     double size() const
     {
         return max - min;
@@ -34,6 +40,13 @@ public:
         if (x > max) return max;
 
         return x;
+    }
+
+    // 
+    interval expand(double delta) const 
+    {
+        auto padding = delta / 2;
+        return interval(min-padding, max+padding);
     }
 
     static const interval empty, universe;

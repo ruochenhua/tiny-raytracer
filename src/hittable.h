@@ -3,6 +3,7 @@
 #define HITTABLE_H
 
 #include "rt_common.h"
+#include "aabb.h"
 
 class material;
 // 碰撞记录
@@ -29,6 +30,8 @@ class hittable
 public:
     virtual ~hittable() = default;
     virtual bool hit(const ray& r,const interval& ray_t, hit_record& rec) const = 0;
+
+    virtual aabb bounding_box() const = 0;
 };
 
 #endif
