@@ -1,10 +1,10 @@
-#include <iostream>
 #include "rt_common.h"
 #include "hittable.h"
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
 #include "material.h"
+#include "bvh.h"
 
 int main() {
     hittable_list world;
@@ -50,12 +50,14 @@ int main() {
     auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
+    world = hittable_list(make_shared<bvh_node>(world));
+    
     camera cam;
 
     cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 240;
-    cam.samples_per_pixel = 30;
-    cam.max_depth         = 50;
+    cam.image_width       = 480;
+    cam.samples_per_pixel = 50;
+    cam.max_depth         = 30;
 
     cam.vfov     = 20;
     cam.lookfrom = point3(13,2,3);

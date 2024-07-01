@@ -31,7 +31,7 @@ public:
     const interval& axis_interval(int n) const 
     {
         if(n == 1) return y;
-        if(n == 2) return x;
+        if(n == 2) return z;
         return x;
     }
 

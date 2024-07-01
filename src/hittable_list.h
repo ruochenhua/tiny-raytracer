@@ -21,7 +21,7 @@ public:
     {
         hit_objects.push_back(object);
         // 更新整个hitable list的aabb
-        bbox = aabb(bbox , object->bounding_box());
+        bbox = aabb(bbox, object->bounding_box());
     }
 
     bool hit(const ray& r, const interval& ray_t, hit_record& rec) const override
