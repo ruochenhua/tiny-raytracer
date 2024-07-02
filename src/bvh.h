@@ -13,7 +13,15 @@ class bvh_node : public hittable
 public:
     bvh_node(std::vector<shared_ptr<hittable>>& objects, size_t start, size_t end)
     {
-        int axis = rand() % 3;
+        //int axis = rand() % 3;
+        // 节点的bounding box包含传入的所有object的boundingbox
+        bbox = aabb::empty;
+        for(size_t i = start; i < end; ++i)
+        {
+            bbox = aabb(bbox, objects[i]->bounding_box());
+        }
+        // 找到最长的轴
+        int axis = bbox.longest_axis();
         auto comparator = (axis == 0) ? box_x_compare
                         : (axis == 1) ? box_y_compare
                         : box_z_compare;
@@ -39,7 +47,7 @@ public:
             right = make_shared<bvh_node>(objects, mid, end);
         }
 
-        bbox = aabb(left->bounding_box(), right->bounding_box());
+        // bbox = aabb(left->bounding_box(), right->bounding_box());
     }
 
     bvh_node(hittable_list& list)

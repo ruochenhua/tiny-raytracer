@@ -77,8 +77,20 @@ public:
         return true;
     }
 
-private:
+    int longest_axis() const
+    {
+        // 找到这个aabb最长的轴，返回索引
+        if(x.size() > y.size())
+            return x.size() > z.size() ? 0 : 2;
+        else
+            return y.size() > z.size() ? 1 : 2;
+    }
 
+
+    static const aabb empty, universe;
 };
+
+const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);
+const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);
 
 #endif
