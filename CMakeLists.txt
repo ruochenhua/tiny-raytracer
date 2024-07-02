@@ -32,6 +32,7 @@ set ( SOURCE_ONE_WEEKEND
   src/vec3.h
   src/aabb.h
   src/bvh.h
+  src/texture.h
 )
 
 # set ( SOURCE_NEXT_WEEK

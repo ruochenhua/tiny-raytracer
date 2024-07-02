@@ -3,6 +3,7 @@
 #define MATERIAL_H
 
 #include "rt_common.h"
+#include "texture.h"
 
 class hit_record;
 
@@ -23,19 +24,20 @@ public:
 class lambertian : public material
 {
 public:
-    lambertian(const color& a) : albedo(a) {}
+    lambertian(const color& a) : tex(make_shared<solid_color>(a)) {}
+    lambertian(shared_ptr<texture> in_tex) : tex(in_tex) {}
 
     virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override
     {
         // 随机选一个方向作为散射方向
         auto scatter_dir = rec.normal + random_unit_vector();
         scattered = ray(rec.p, scatter_dir, r_in.time());
-        attenuation = albedo;
+        attenuation = tex->value(rec.u, rec.v, rec.p);
         return true;
     }
 
 private:
-    color albedo;
+    shared_ptr<texture> tex;
 };
 
 // 金属材质

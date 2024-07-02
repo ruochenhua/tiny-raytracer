@@ -12,6 +12,7 @@ struct hit_record
     point3 p;
     vec3 normal;
     double t;
+    double u, v;    // 贴图
     bool b_front_face;
     shared_ptr<material> mat;
 
