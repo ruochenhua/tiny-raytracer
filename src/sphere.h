@@ -63,6 +63,8 @@ public:
         auto outward_normal = (rec.p - center) / radius;
         rec.set_face_normal(r, outward_normal);
         rec.mat = mat;
+        // 更新击中点的uv坐标
+        get_sphere_uv(outward_normal, rec.u, rec.v);
         
         return true;
     }
@@ -72,6 +74,25 @@ public:
         // 这里也默认球体在做匀速运动，当然是不准确的
         // 目前仅仅是测试动态模糊效果，可以不必深究
         return center + time*movement_vec;
+    }
+
+    void get_sphere_uv(const point3& p, double& u, double& v) const
+    {
+        /*
+        球体的uv一般参考自经纬度，用theta代表纬度[-90,90]，用phi代表经度[0,360]，uv的范围从[0,1]
+        那么u=phi/2pi; v=theta/pi，映射到用xyz表示的话，那么就是
+        y=-cos(theta); x=-cos(phi)sin(theta); z=sin(phi)sin(theta)
+        所以theta=arccos(-y)
+        phi=atan2(z, -x); 由于函数的结果是映射到[-pi,pi]之间的，所以我们需要映射到[0, 2*pi]
+        由atan2(a,b)=atan2(-a,-b)+pi, 可得phi=atan2(-z, x)+pi
+        下面是代码实现
+        */ 
+        
+        auto theta = acos(-p.y());
+        auto phi = atan2(-p.z(), p.x()) + pi;
+
+        u = phi / (2.0 * pi);
+        v = theta / pi;
     }
 
     aabb bounding_box() const override {return bbox;}
