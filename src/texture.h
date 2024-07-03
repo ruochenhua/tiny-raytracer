@@ -3,7 +3,8 @@
 #define TEXTURE_H
 
 #include "rt_common.h"
-// 贴图类
+#include "rt_stb_image.h"
+
 class texture
 {
 public:
@@ -61,6 +62,34 @@ private:
     double inv_scale;
     shared_ptr<texture> even;
     shared_ptr<texture> odd;
+};
+
+// 图片类型贴图
+class image_texture : public texture
+{
+public:
+    image_texture(const char* filename) : image(filename) {}
+
+    color value(double u, double v, const point3& p) const override
+    {
+        // 贴图错误，返回一个debug值
+        if(image.height() <= 0 ) return color(0, 1, 1);
+
+        // uv需要在[0,1],v的坐标需要反一下（图片是上到下，我们object的v计算是按照下到上）
+        u = interval(0, 1).clamp(u);
+        v = 1.0 - interval(0, 1).clamp(v);
+
+        auto i = int(u*image.width());
+        auto j = int(v*image.height());
+        auto pixel = image.pixel_data(i, j);
+
+        auto color_scale = 1.0/255.0;
+
+        return color_scale*color(pixel[0], pixel[1], pixel[2]);
+    }
+
+private:
+    rtw_image image;
 };
 
 #endif
