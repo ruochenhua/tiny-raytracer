@@ -98,15 +98,16 @@ class noise_texture : public texture
 {
 public:
     noise_texture() {}
-
+    noise_texture(double in_scale) : scale(in_scale) {}
     color value(double u, double v, const point3& p) const override
     {
         // 噪声的颜色只和位置相关
-        return color(1,1,1) * noise.noise(p);
+        return color(1,1,1) * noise.noise(p * scale);
     }
     
 private:
     perlin noise;
+    double scale = 1.0;
 };
 
 #endif
