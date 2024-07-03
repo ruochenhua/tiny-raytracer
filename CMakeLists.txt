@@ -14,9 +14,9 @@ set ( CMAKE_CXX_EXTENSIONS        OFF )
 
 # Source
 
-# set ( EXTERNAL
-#   src/external/stb_image.h
-# )
+set ( EXTERNAL
+  src/external/stb_image.h
+)
 
 set ( SOURCE_ONE_WEEKEND
   src/main.cpp
