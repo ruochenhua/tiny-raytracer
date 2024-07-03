@@ -33,6 +33,7 @@ set ( SOURCE_ONE_WEEKEND
   src/aabb.h
   src/bvh.h
   src/texture.h
+  src/perlin.h
 )
 
 # set ( SOURCE_NEXT_WEEK

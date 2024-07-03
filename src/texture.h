@@ -4,6 +4,7 @@
 
 #include "rt_common.h"
 #include "rt_stb_image.h"
+#include "perlin.h"
 
 class texture
 {
@@ -90,6 +91,22 @@ public:
 
 private:
     rtw_image image;
+};
+
+// 噪声贴图（perlin）
+class noise_texture : public texture
+{
+public:
+    noise_texture() {}
+
+    color value(double u, double v, const point3& p) const override
+    {
+        // 噪声的颜色只和位置相关
+        return color(1,1,1) * noise.noise(p);
+    }
+    
+private:
+    perlin noise;
 };
 
 #endif
