@@ -102,7 +102,8 @@ public:
     color value(double u, double v, const point3& p) const override
     {
         // 噪声的颜色只和位置相关
-        return color(1,1,1) * noise.noise(p * scale);
+        // 这里noise.noise的值是[-1,1],需要映射到[0,1]
+        return color(1,1,1) * 0.5 *(1.0 +  noise.noise(p * scale));
     }
     
 private:
