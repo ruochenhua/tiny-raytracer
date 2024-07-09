@@ -34,6 +34,7 @@ set ( SOURCE_ONE_WEEKEND
   src/bvh.h
   src/texture.h
   src/perlin.h
+  src/quad.h
 )
 
 # set ( SOURCE_NEXT_WEEK
