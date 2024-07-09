@@ -13,6 +13,7 @@ public:
     int image_width = 480;
     int samples_per_pixel = 10;     //每个像素做多次采样
     int max_depth = 10;     // 射线检测递归深度
+    color background;       // 背景颜色
 
     double vfov = 75;       // 垂直fov的大小
     point3 lookfrom = point3(0,0,0);    // 相机位置
@@ -143,25 +144,36 @@ private:
             return color(0,0,0);
         }
         hit_record rec;
+        // 没有击中就返回背景颜色
         // interval从0.001开始，避免ray反弹的时候起始点取值取到表面内部
-        if(world.hit(r, interval(0.001, infinity), rec))
+        if(!world.hit(r, interval(0.001, infinity), rec))
         {
-            ray scattered;
-            color attenuation;
-            // 物体反射的颜色将会根据材质不同而不同
-            if(rec.mat->scatter(r, rec, attenuation, scattered))
-            {
-                return attenuation*ray_color(scattered, depth-1, world);
-            }
-            // vec3 direction = random_on_hemisphere(rec.normal);
-            // vec3 direction = rec.normal + random_unit_vector(); 
-            return color(0,0,0);
+            return background;
+        }
+                
+        ray scattered;
+        color attenuation;
+        // 击中物体发出的光
+        color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+        // 如果击中材料不再散射，直接使用发光的颜色（不发光就是黑色）
+        if(!rec.mat->scatter(r, rec, attenuation, scattered))
+        {
+            return color_from_emission;            
         }
 
-        // lerp between two color
-        vec3 unit_dir = unit_vector(r.direction());
-        auto a = 0.5*(unit_dir.y() + 1.0);  // 从范围-1至1映射到范围0至1
-        return (1.0-a)*color(1.0,1.0,1.0) + a*color(0.5, 0.7, 1.0);    
+        // 物体散射的颜色将会根据材质不同而不同
+        color color_from_scatter = attenuation*ray_color(scattered, depth-1, world);
+        
+        // vec3 direction = random_on_hemisphere(rec.normal);
+        // vec3 direction = rec.normal + random_unit_vector(); 
+        // 物体的颜色是散射和发光的颜色的和
+        return color_from_emission + color_from_scatter;
+
+        // 原来的背景颜色计算，现在抛弃
+        // // lerp between two color
+        // vec3 unit_dir = unit_vector(r.direction());
+        // auto a = 0.5*(unit_dir.y() + 1.0);  // 从范围-1至1映射到范围0至1
+        // return (1.0-a)*color(1.0,1.0,1.0) + a*color(0.5, 0.7, 1.0);    
     }
 
     point3 defocus_disk_sample() const

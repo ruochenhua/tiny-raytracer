@@ -113,4 +113,5 @@ private:
     double scale = 1.0;
 };
 
+
 #endif
