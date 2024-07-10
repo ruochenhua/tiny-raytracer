@@ -35,6 +35,7 @@ public:
     virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override
     {
         // 随机选一个方向作为散射方向
+        // 优化为从法线方向延伸出去再各个方向均匀概率的随机，这种随机分布效果比在集中点在法线正向半球随机分布要好
         auto scatter_dir = rec.normal + random_unit_vector();
         scattered = ray(rec.p, scatter_dir, r_in.time());
         attenuation = tex->value(rec.u, rec.v, rec.p);
@@ -123,6 +124,25 @@ public:
     }
 
 
+private:
+    shared_ptr<texture> tex;
+};
+
+// 各向同性材质，可用于烟雾等散射
+class isotropic : public material
+{
+public:
+    isotropic(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
+    isotropic(shared_ptr<texture> in_tex) : tex(in_tex) {}
+
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override
+    {
+        // 向各个方向散射，而不只是法线正向的那个面的方向
+        scattered = ray(rec.p, random_unit_vector(), r_in.time());
+        attenuation = tex->value(rec.u, rec.v, rec.p);
+
+        return true;
+    }
 private:
     shared_ptr<texture> tex;
 };
