@@ -14,6 +14,7 @@
 
 上面是教程的BVH示意图。
 简单来说就是将场景中的所有object进行以下处理
+
 1. 将所有object用一个大包围体（Bounding Volume）包起来，作为树状结构的父节点
 
 2. 从这个父节点开始，将里面的所有object根据**规则**分成两个集团，每个集团重新构建一个包围体包围所有的object，作为这个父节点的子节点。
@@ -33,18 +34,48 @@ theNextWeek里面介绍了球体映射贴图的一种实现。其实也就是根
 
 ## 关于Perlin Noise
 Perlin Noise是一个挺有意思的议题。后面如果有时间我想专门研究一下它的实现以及各种变种。不过这里我不是很想深入探讨，这里的Perlin Noise其实就是作为一种贴图的效果呈现，感觉和光线追踪这个话题的相关性其实并不深，不过下面还是贴几张教程中的Perlin Noise的效果图好了。
+
 ![Perlin texture with trilinear interpolation](https://raytracing.github.io/images/img-2.10-perlin-trilerp.png)
+
 ![Perlin texture, shifted off integer values](https://raytracing.github.io/images/img-2.13-perlin-shift.png)
+
 ![Perlin noise, marbled texture](https://raytracing.github.io/images/img-2.15-perlin-marble.png)
 
 
 ## 关于四边形
 之前光线追踪器只支持球体，因为球体确实是数学表现上最简单的一种形状了。
 这次新增了四边形，其表现形式是通过在四边形上的一个角Q，加上另外两条边u，v。
+
 ![四边形](https://raytracing.github.io/images/fig-2.05-quad-def.jpg)
 
 光线和四边形的碰撞检测，分为两步：
+
 1. 光线和四边形所处平面的相交点P计算，剔除掉相交点在射线方向后方，以及光线和平面平行的情况。
 2. 相交点P投影到以u，v为坐标轴，以Q为坐标原点的2D坐标系统上，判断P的xy坐标是否在[0,1]的范围之内。
+
+![四边形的射线检测判断](https://raytracing.github.io/images/fig-2.07-quad-coords.jpg)
+
+### 关于光照
+光照在theNextWeek里面是作为一种材质来处理，即emissive material。
+
+在加入发光材料后，光线击中平面后新增了一个颜色分量需要计算。原来是只有散射分量(scatter)，现在增加了发射分量(emissive)。
+
+这里并没有特意处理*影子*的情况，但是光线追踪出来的画面却有*影子*的特性如下图：
+
+![Cornell box with two blocks](https://raytracing.github.io/images/img-2.20-cornell-blocks.png)
+
+这里我试着解释一下这种现象：
+在我们这个光线追踪器，屏幕上每个像素最终的颜色，是经由这个像素点射出的光线，和每个击中的hittable object得到的颜色的总和。
+
+在击中hittable object的时候光线会进行反射(**漫反射、镜面反射都有可能，和material相关**)，而在阴影中的像素区域，光线击中object后的反射是不会到达光源的；反之不在阴影中的区域，光击中这些区域后**有概率**会经过反射后击中emissive material的hittable object。光源和非光源object的区别在于光源有emissive color分量，这个一般是比scatter分量的值要大的多的。
+
+因此阴影中的区域的光线能量就会更弱，光源的能量需要多次反弹才有可能到达该区域，且期间光线衰减了多次，因此表现出更暗的阴影的效果。
+
+## 关于Translation和Rotation
+这两个章节主要是为了方便后续场景搭建，和光追感觉关系其实不是很大，略过。
+
+## Volumes
+
+
 
 
