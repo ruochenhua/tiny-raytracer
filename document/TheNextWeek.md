@@ -74,8 +74,19 @@ Perlin Noise是一个挺有意思的议题。后面如果有时间我想专门�
 ## 关于Translation和Rotation
 这两个章节主要是为了方便后续场景搭建，和光追感觉关系其实不是很大，略过。
 
-## Volumes
+## 关于Volumes
+对于烟、雾等介质进行光线追踪，实现上采取了一种随机思维。
 
+![Ray-volume interaction](https://raytracing.github.io/images/fig-2.10-ray-vol.jpg)
+
+即光线穿过介质的时候，有概率会在介质内某一点进行散射，也有可能会穿过这个介质。因此每次计算光线和介质相交的时候都会计算一个概率，这个概率用于计算这个点在何时击中。如果击中的地方在介质之内，则在那个位置根据介质的材质散射；如果不在介质之内，而说明穿透了介质，不作为击中处理。
+
+![Cornell box with blocks of smoke](https://raytracing.github.io/images/img-2.22-cornell-smoke.png)
+
+
+## 总结
+至此，光线追踪告一段落。我们有了一个很酷的软件光线追踪器。
+该教程的系列的下一步：Ray Tracing: The Rest of Your Life会更专注于优化的方向，包括边缘处理，画面降噪等等。后续读完也会再慢慢进行探讨。
 
 
 
